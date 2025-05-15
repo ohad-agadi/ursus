@@ -8,3 +8,7 @@ edition = "2024_07"
 [dependencies]
 cairo_execute = "2.11.4"
 
+[executable]
+
+[cairo]
+enable-gas = false

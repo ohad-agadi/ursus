@@ -46,7 +46,9 @@ pub fn execute_and_prove(target_path: &str) -> CairoProof<Blake2sMerkleHasher> {
         ..Default::default()
     };
 
+    println!("Executing program...");
     let runner = cairo_run_program(&program, &cairo_run_config, &mut hint_processor).unwrap();
+    println!("Program executed successfully.");
     let public_input = runner.get_air_public_input().unwrap();
     let addresses = public_input
         .public_memory
@@ -89,7 +91,11 @@ pub fn execute_and_prove(target_path: &str) -> CairoProof<Blake2sMerkleHasher> {
         });
     let mem = MemoryBuilder::from_iter(MemoryConfig::default(), mem);
 
+    println!("Generating input for the prover...");
     let input = adapt_to_stwo_input(&trace, mem, addresses, &segments).unwrap();
+    println!("Input for the prover generated successfully.");
+
+    println!("Proving...");
     let pcs_config = PcsConfig::default();
     let preprocessed_trace = PreProcessedTraceVariant::CanonicalWithoutPedersen;
     stwo_cairo_prover::prover::prove_cairo::<Blake2sMerkleChannel>(

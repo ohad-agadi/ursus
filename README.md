@@ -1,7 +1,6 @@
 # Ursus
 
-Ursus is a Cairo program prover and verifier that enables generating and verifying proofs for Cairo programs.
-
+Execute with sw development, prove with stwo-cairo-prover.
 
 ## Installation
 
@@ -20,7 +19,12 @@ sudo cp target/release/ursus /usr/local/bin/
 
 ## Usage
 
-Ursus provides two main commands: `prove` and `verify`.
+### Compiling a project.
+
+Use scarb to compile an executable:
+```bash
+    scarb  --profile release build 
+```
 
 ### Generating a Proof
 
@@ -32,7 +36,7 @@ ursus prove --target <path-to-cairo-program> --proof <output-proof-path>
 
 Example:
 ```bash
-ursus prove --target ./programs/example.cairo --proof ./proofs/example_proof.json
+ursus prove --target <project_dir>/target/release/example.executable.json --proof ./proofs/example_proof.json
 ```
 
 ### Verifying a Proof

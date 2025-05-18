@@ -19,6 +19,18 @@ fn compile_project(scarb_project_path: &str) {
     }
 }
 
+fn execute_program(scarb_project_path: &str) {
+    let output = Command::new("bash")
+        .arg("-c")
+        .arg(format!(
+            "cd {} && scarb execute",
+            scarb_project_path
+        ))
+        .output()
+        .expect("Failed to execute program");
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    println!("{}", stdout);
+}
 #[cfg(test)]
 mod tests {
     use super::*;

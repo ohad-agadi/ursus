@@ -2,6 +2,11 @@
 
 Execute with sw development, prove with stwo-cairo-prover.
 
+## Prerequisites
+
+- Scarb 2.11.4
+- Rust, version mentioned in `rust-toolchain.toml`.
+
 ## Installation
 
 ```bash
@@ -9,7 +14,7 @@ Execute with sw development, prove with stwo-cairo-prover.
 git clone <repository-url>
 cd ursus
 
-# Build the project with native CPU optimizations
+# Build the project,
 ./build.sh
 
 # Optional: Add the binary to your PATH
@@ -60,12 +65,9 @@ ursus verify ./proofs/example_proof.json
 
 ### Verify Command
 - First argument: Path to the proof file to verify
+- with-perdern: Optional, if pedersen was used in the proof, more pre-processed columns are needed.
 
 ## Output
 
 - When generating a proof, the proof will be saved as a JSON file at the specified path
 - When verifying a proof, the result of the verification will be printed to the console
-
-## License
-
-[Add your license information here] 

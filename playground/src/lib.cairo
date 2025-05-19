@@ -1,25 +1,15 @@
-use core::poseidon::poseidon_hash_span;
-
+use core::blake::blake2s_compress;
 
 #[executable]
-fn main(mut n: felt252) -> felt252 {
-    let a = fib(n);
-    let mut felt: felt252 = a.into();
-    while n != 0 {
-        felt = poseidon_hash_span([felt].span());
-        n = n - 1;
-    }
-    felt
+fn main(mut n: felt252) -> [u32; 8] {
+    chain_hash(n)
 }
 
-fn fib(mut n: felt252) -> felt252 {
-    let mut a: felt252 = 1;
-    let mut b: felt252 = 1;
+fn chain_hash(mut n: felt252) -> [u32; 8] {
+    let mut hash = BoxTrait::new([0; 8]);
     while n != 0 {
+        hash = blake2s_compress(hash, 0, BoxTrait::new([0; 16]));
         n = n - 1;
-        let temp = b;
-        b = a + b;
-        a = temp;
     }
-    a
+    hash.unbox()
 }

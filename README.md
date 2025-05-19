@@ -4,8 +4,8 @@ Execute with sw development, prove with stwo-cairo-prover.
 
 ## Prerequisites
 
-- Scarb 2.11.4
 - Rust, version mentioned in `rust-toolchain.toml`.
+- Scarb (Optional/Recommended).
 
 ## Installation
 

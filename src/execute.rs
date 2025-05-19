@@ -18,17 +18,15 @@ use stwo_cairo_prover::stwo_prover::core::vcs::blake2_merkle::{
     Blake2sMerkleChannel, Blake2sMerkleHasher,
 };
 
-pub fn execute_and_prove(target_path: &str) -> CairoProof<Blake2sMerkleHasher> {
+pub fn execute_and_prove(target_path: &str, args: Vec<Arg>) -> CairoProof<Blake2sMerkleHasher> {
     let executable: Executable =
         serde_json::from_reader(std::fs::File::open(target_path).unwrap()).unwrap();
 
     let (program, string_to_hint) = program_and_hints_from_executable(&executable);
 
-    let user_args = vec![];
-
     let mut hint_processor = CairoHintProcessor {
         runner: None,
-        user_args: vec![vec![Arg::Array(user_args)]],
+        user_args: vec![vec![Arg::Array(args)]],
         string_to_hint,
         starknet_state: Default::default(),
         run_resources: Default::default(),
@@ -156,13 +154,15 @@ fn program_and_hints_from_executable(executable: &Executable) -> (Program, HashM
 #[cfg(test)]
 mod tests {
     use cairo_air::verifier::verify_cairo;
+    use num_bigint::BigInt;
 
     use super::*;
 
     #[test]
     fn test_e2e() {
         let target_path = "/home/ohad/ursus/playground/target/release/playground.executable.json";
-        let proof = execute_and_prove(target_path);
+        let args = vec![Arg::Value(Felt252::from(BigInt::from(100)))];
+        let proof = execute_and_prove(target_path, args);
         let pcs_config = PcsConfig::default();
         let preprocessed_trace = PreProcessedTraceVariant::CanonicalWithoutPedersen;
         let result = verify_cairo::<Blake2sMerkleChannel>(proof, pcs_config, preprocessed_trace);

@@ -6,6 +6,7 @@ use cairo_air::PreProcessedTraceVariant;
 use clap::{Parser, Subcommand};
 use stwo_cairo_prover::stwo_prover::core::pcs::PcsConfig;
 use stwo_cairo_prover::stwo_prover::core::vcs::blake2_merkle::Blake2sMerkleChannel;
+use ursus::args::ProgramArguments;
 use ursus::execute::execute_and_prove;
 
 #[derive(Parser)]
@@ -23,6 +24,20 @@ enum Commands {
         target: PathBuf,
         /// Path to the proof file
         proof: PathBuf,
+        /// Program arguments as comma-separated values
+        #[arg(
+            long,
+            value_delimiter = ',',
+            help = "Program arguments as comma-separated values"
+        )]
+        arguments: Option<Vec<num_bigint::BigInt>>,
+        /// Path to a file containing program arguments
+        #[arg(
+            long,
+            conflicts_with = "arguments",
+            help = "Path to a file containing program arguments"
+        )]
+        arguments_file: Option<camino::Utf8PathBuf>,
     },
     /// Verify a proof
     Verify {
@@ -38,10 +53,19 @@ fn main() {
     let cli = Cli::parse();
 
     match cli.command {
-        Commands::Prove { target, proof } => {
+        Commands::Prove {
+            target,
+            proof,
+            arguments,
+            arguments_file,
+        } => {
             println!("Generating proof for target: {:?}", target);
             let start = Instant::now();
-            let cairo_proof = execute_and_prove(target.to_str().unwrap());
+            let args = ProgramArguments {
+                arguments: arguments.unwrap_or_default(),
+                arguments_file,
+            };
+            let cairo_proof = execute_and_prove(target.to_str().unwrap(), args);
             let elapsed = start.elapsed();
             // serialize proof to file
             let proof_json = serde_json::to_string(&cairo_proof).unwrap();

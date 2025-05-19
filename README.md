@@ -31,12 +31,12 @@ Use scarb to compile an executable:
 To generate a proof for a Cairo program:
 
 ```bash
-ursus prove --target <path-to-cairo-program> --proof <output-proof-path>
+ursus prove <path-to-cairo-program> <output-proof-path>
 ```
 
 Example:
 ```bash
-ursus prove --target <project_dir>/target/release/example.executable.json --proof ./proofs/example_proof.json
+ursus prove <project_dir>/target/release/example.executable.json ./proofs/example_proof.json
 ```
 
 ### Verifying a Proof
@@ -44,22 +44,22 @@ ursus prove --target <project_dir>/target/release/example.executable.json --proo
 To verify an existing proof:
 
 ```bash
-ursus verify --proof <path-to-proof-file>
+ursus verify <path-to-proof-file>
 ```
 
 Example:
 ```bash
-ursus verify --proof ./proofs/example_proof.json
+ursus verify ./proofs/example_proof.json
 ```
 
 ## Command Line Arguments
 
 ### Prove Command
-- `--target` or `-t`: Path to the Cairo program file to prove
-- `--proof` or `-p`: Path where the generated proof will be saved (JSON format)
+- First argument: Path to the Cairo program file to prove
+- Second argument: Path where the generated proof will be saved (JSON format)
 
 ### Verify Command
-- `--proof` or `-p`: Path to the proof file to verify
+- First argument: Path to the proof file to verify
 
 ## Output
 

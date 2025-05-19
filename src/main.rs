@@ -1,8 +1,10 @@
 use std::path::PathBuf;
 
-use cairo_air::{verifier::verify_cairo, PreProcessedTraceVariant};
+use cairo_air::verifier::verify_cairo;
+use cairo_air::PreProcessedTraceVariant;
 use clap::{Parser, Subcommand};
-use stwo_cairo_prover::stwo_prover::core::{pcs::PcsConfig, vcs::blake2_merkle::Blake2sMerkleChannel};
+use stwo_cairo_prover::stwo_prover::core::pcs::PcsConfig;
+use stwo_cairo_prover::stwo_prover::core::vcs::blake2_merkle::Blake2sMerkleChannel;
 use ursus::execute::execute_and_prove;
 
 #[derive(Parser)]
@@ -17,16 +19,13 @@ enum Commands {
     /// Generate a proof for a target file
     Prove {
         /// Path to the target file
-        #[arg(short, long)]
         target: PathBuf,
         /// Path to the proof file
-        #[arg(short, long)]
         proof: PathBuf,
     },
     /// Verify a proof
     Verify {
         /// Path to the proof JSON file
-        #[arg(short, long)]
         proof: PathBuf,
     },
 }

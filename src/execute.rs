@@ -12,6 +12,7 @@ use cairo_vm::Felt252;
 use stwo_cairo_adapter::builtins::MemorySegmentAddresses;
 use stwo_cairo_adapter::memory::{MemoryBuilder, MemoryConfig, MemoryEntry};
 use stwo_cairo_adapter::vm_import::{adapt_to_stwo_input, RelocatedTraceEntry};
+use stwo_cairo_adapter::PublicSegmentContext;
 use stwo_cairo_prover::stwo_prover::core::pcs::PcsConfig;
 use stwo_cairo_prover::stwo_prover::core::vcs::blake2_merkle::{
     Blake2sMerkleChannel, Blake2sMerkleHasher,
@@ -93,15 +94,19 @@ pub fn execute_and_prove(target_path: &str) -> CairoProof<Blake2sMerkleHasher> {
             })
         });
     let mem = MemoryBuilder::from_iter(MemoryConfig::default(), mem);
+    let main_args = runner
+        .get_program()
+        .iter_builtins()
+        .copied()
+        .collect::<Vec<_>>();
+    let public_segment_context = PublicSegmentContext::new(&main_args);
 
     println!("Generating input for the prover...");
-    let input = adapt_to_stwo_input(&trace, mem, addresses, &segments).unwrap();
+    let input =
+        adapt_to_stwo_input(&trace, mem, addresses, &segments, public_segment_context).unwrap();
     println!("Input for the prover generated successfully.");
-    println!(
-        "Steps: {:?}",
-        input.state_transitions.casm_states_by_opcode.counts()
-    );
-    println!("Builtins: {:?}", input.builtins_segments.get_counts());
+    println!("Steps: {}", input.state_transitions.casm_states_by_opcode);
+    println!("Builtins: {:#?}", input.builtins_segments.get_counts());
 
     println!("Proving...");
     let pcs_config = PcsConfig::default();

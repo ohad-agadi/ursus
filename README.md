@@ -57,15 +57,8 @@ Example:
 ursus verify ./proofs/example_proof.json
 ```
 
-## Command Line Arguments
-
-### Prove Command
-- First argument: Path to the Cairo program file to prove
-- Second argument: Path where the generated proof will be saved (JSON format)
-
-### Verify Command
-- First argument: Path to the proof file to verify
-- with-perdern: Optional, if pedersen was used in the proof, more pre-processed columns are needed.
+## Pre-processed trace:
+When pedersen is used in the proof, more pre-processed columns are needed. The variant is automatically in `prove`. verify with --with-pedersen.
 
 ## Output
 

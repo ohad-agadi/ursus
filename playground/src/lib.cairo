@@ -1,13 +1,15 @@
+use core::pedersen::pedersen;
 use core::poseidon::poseidon_hash_span;
 
 
 #[executable]
 fn main() -> felt252 {
     let a = fib(16);
-    let mut felt: felt252 = a.into();
+    let felt: felt252 = a.into();
+    let mut b = pedersen(felt, felt);
     let mut n: u32 = 100;
     while n != 0 {
-        felt = poseidon_hash_span([felt].span());
+        b = poseidon_hash_span([b].span());
         n = n - 1;
     }
     felt

@@ -101,16 +101,21 @@ pub fn execute_and_prove(target_path: &str) -> CairoProof<Blake2sMerkleHasher> {
         .collect::<Vec<_>>();
     let public_segment_context = PublicSegmentContext::new(&main_args);
 
+    let preprocessed_trace = match public_segment_context[1] {
+        true => PreProcessedTraceVariant::Canonical,
+        false => PreProcessedTraceVariant::CanonicalWithoutPedersen,
+    };
+
     println!("Generating input for the prover...");
     let input =
         adapt_to_stwo_input(&trace, mem, addresses, &segments, public_segment_context).unwrap();
-    println!("Input for the prover generated successfully.");
-    println!("Steps: {}", input.state_transitions.casm_states_by_opcode);
+    println!("Input for the prover generated successfully.\n");
+    println!("{}", input.state_transitions.casm_states_by_opcode);
     println!("Builtins: {:#?}", input.builtins_segments.get_counts());
 
+    println!("Using preprocessed trace: {:?}", preprocessed_trace);
     println!("Proving...");
     let pcs_config = PcsConfig::default();
-    let preprocessed_trace = PreProcessedTraceVariant::CanonicalWithoutPedersen;
     stwo_cairo_prover::prover::prove_cairo::<Blake2sMerkleChannel>(
         input,
         pcs_config,

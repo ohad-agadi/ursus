@@ -28,6 +28,9 @@ enum Commands {
     Verify {
         /// Path to the proof JSON file
         proof: PathBuf,
+        /// Canonical trace, if Pedersen is included in the program.
+        #[arg(short, long)]
+        with_pedersen: bool,
     },
 }
 
@@ -46,13 +49,19 @@ fn main() {
             println!("Proof saved to: {:?}", proof);
             println!("Proof generation completed in {:.2?}", elapsed);
         }
-        Commands::Verify { proof } => {
+        Commands::Verify {
+            proof,
+            with_pedersen,
+        } => {
             println!("Verifying proof from: {:?}", proof);
             let cairo_proof =
                 serde_json::from_reader(std::fs::File::open(proof.to_str().unwrap()).unwrap())
                     .unwrap();
             let pcs_config = PcsConfig::default();
-            let preprocessed_trace = PreProcessedTraceVariant::CanonicalWithoutPedersen;
+            let preprocessed_trace = match with_pedersen {
+                true => PreProcessedTraceVariant::Canonical,
+                false => PreProcessedTraceVariant::CanonicalWithoutPedersen,
+            };
             let result =
                 verify_cairo::<Blake2sMerkleChannel>(cairo_proof, pcs_config, preprocessed_trace);
             println!("Verification result: {:?}", result);

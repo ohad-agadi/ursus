@@ -28,6 +28,7 @@ sudo cp target/release/ursus /usr/local/bin/
 
 Use scarb to compile an executable:
 ```bash
+    cd example
     scarb  --profile release build 
 ```
 
@@ -36,12 +37,12 @@ Use scarb to compile an executable:
 To generate a proof for a Cairo program:
 
 ```bash
-ursus prove <path-to-cairo-program> <output-proof-path>
+ursus prove <path-to-cairo-program> <output-proof-path> --arguments <args> 
 ```
 
 Example:
 ```bash
-ursus prove <project_dir>/target/release/example.executable.json ./proofs/example_proof.json
+ursus prove target/release/example.executable.json ./example_proof.json --arguments 10000
 ```
 
 ### Verifying a Proof
@@ -54,7 +55,7 @@ ursus verify <path-to-proof-file>
 
 Example:
 ```bash
-ursus verify ./proofs/example_proof.json
+ursus verify ./example_proof.json
 ```
 
 ## Pre-processed trace:

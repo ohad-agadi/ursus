@@ -5,7 +5,7 @@ Execute with sw development, prove with stwo-cairo-prover.
 ## Prerequisites
 
 - Rust, version mentioned in `rust-toolchain.toml`.
-- Scarb (Optional/Recommended).
+- Scarb (Optional/Recommended). To run the example it's recommended to compile with `scarb nightly-2025-04-12`.
 
 ## Installation
 

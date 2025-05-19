@@ -1,5 +1,5 @@
-use core::pedersen::pedersen;
 use core::poseidon::poseidon_hash_span;
+use core::pedersen::{pedersen};
 
 
 #[executable]

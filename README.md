@@ -59,7 +59,7 @@ ursus verify ./proofs/example_proof.json
 
 ## Pre-processed trace:
 When pedersen is used in the proof, more pre-processed columns are needed. The variant is automatically deduced during `prove`. 
-Verify with --with-pedersen.
+Verify with `--with-pedersen`.
 
 ## Output
 

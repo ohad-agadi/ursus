@@ -65,7 +65,7 @@ fn main() {
                 arguments: arguments.unwrap_or_default(),
                 arguments_file,
             };
-            let cairo_proof = execute_and_prove(target.to_str().unwrap(), args);
+            let cairo_proof = execute_and_prove(target.to_str().unwrap(), args.read_arguments());
             let elapsed = start.elapsed();
             // serialize proof to file
             let proof_json = serde_json::to_string(&cairo_proof).unwrap();

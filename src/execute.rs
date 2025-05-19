@@ -1,11 +1,14 @@
 use std::collections::HashMap;
 
 use cairo_air::{CairoProof, PreProcessedTraceVariant};
-use cairo_lang_executable::executable::Executable;
-use cairo_lang_execute_utils::program_and_hints_from_executable;
-use cairo_lang_runner::{Arg, CairoHintProcessor};
+use cairo_lang_casm::hints::Hint;
+use cairo_lang_executable::executable::{EntryPointKind, Executable};
+use cairo_lang_runner::{build_hints_dict, Arg, CairoHintProcessor};
 use cairo_vm::cairo_run::{cairo_run_program, CairoRunConfig};
 use cairo_vm::types::layout_name::LayoutName;
+use cairo_vm::types::program::Program;
+use cairo_vm::types::relocatable::MaybeRelocatable;
+use cairo_vm::Felt252;
 use stwo_cairo_adapter::builtins::MemorySegmentAddresses;
 use stwo_cairo_adapter::memory::{MemoryBuilder, MemoryConfig, MemoryEntry};
 use stwo_cairo_adapter::vm_import::{adapt_to_stwo_input, RelocatedTraceEntry};
@@ -18,7 +21,7 @@ pub fn execute_and_prove(target_path: &str) -> CairoProof<Blake2sMerkleHasher> {
     let executable: Executable =
         serde_json::from_reader(std::fs::File::open(target_path).unwrap()).unwrap();
 
-    let (program, string_to_hint) = program_and_hints_from_executable(&executable, true).unwrap();
+    let (program, string_to_hint) = program_and_hints_from_executable(&executable);
 
     let user_args = vec![];
 
@@ -94,6 +97,11 @@ pub fn execute_and_prove(target_path: &str) -> CairoProof<Blake2sMerkleHasher> {
     println!("Generating input for the prover...");
     let input = adapt_to_stwo_input(&trace, mem, addresses, &segments).unwrap();
     println!("Input for the prover generated successfully.");
+    println!(
+        "Steps: {:?}",
+        input.state_transitions.casm_states_by_opcode.counts()
+    );
+    println!("Builtins: {:?}", input.builtins_segments.get_counts());
 
     println!("Proving...");
     let pcs_config = PcsConfig::default();
@@ -104,6 +112,35 @@ pub fn execute_and_prove(target_path: &str) -> CairoProof<Blake2sMerkleHasher> {
         preprocessed_trace,
     )
     .unwrap()
+}
+
+fn program_and_hints_from_executable(executable: &Executable) -> (Program, HashMap<String, Hint>) {
+    let data: Vec<MaybeRelocatable> = executable
+        .program
+        .bytecode
+        .iter()
+        .map(Felt252::from)
+        .map(MaybeRelocatable::from)
+        .collect();
+    let (hints, string_to_hint) = build_hints_dict(&executable.program.hints);
+    let entrypoint = executable
+        .entrypoints
+        .iter()
+        .find(|e| matches!(e.kind, EntryPointKind::Standalone))
+        .unwrap();
+    let program = Program::new_for_proof(
+        entrypoint.builtins.clone(),
+        data,
+        entrypoint.offset,
+        entrypoint.offset + 4,
+        hints,
+        Default::default(),
+        Default::default(),
+        vec![],
+        None,
+    )
+    .unwrap();
+    (program, string_to_hint)
 }
 
 #[cfg(test)]

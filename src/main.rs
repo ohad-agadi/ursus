@@ -4,7 +4,7 @@ use cairo_air::verifier::verify_cairo;
 use cairo_air::{CairoProof, PreProcessedTraceVariant};
 use cairo_lang_runner::Arg;
 use clap::Parser;
-use log::{info, warn};
+use log::{error, info};
 use stwo_cairo_prover::stwo_prover::core::fri::FriConfig;
 use stwo_cairo_prover::stwo_prover::core::pcs::PcsConfig;
 use stwo_cairo_prover::stwo_prover::core::vcs::blake2_merkle::{
@@ -24,6 +24,16 @@ fn execute_and_prove(
     prove(input, pcs_config)
 }
 
+fn hundred_bit_secure_config() -> PcsConfig {
+    PcsConfig {
+        pow_bits: 26,
+        fri_config: FriConfig {
+            log_last_layer_degree_bound: 0,
+            log_blowup_factor: 1,
+            n_queries: 70,
+        },
+    }
+}
 fn main() {
     env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("info")).init();
 
@@ -42,16 +52,11 @@ fn main() {
                 arguments: arguments.unwrap_or_default(),
                 arguments_file,
             };
-            let pcs_config = PcsConfig {
-                pow_bits: 26,
-                fri_config: FriConfig {
-                    log_last_layer_degree_bound: 0,
-                    log_blowup_factor: 1,
-                    n_queries: 70,
-                },
-            };
-            let cairo_proof =
-                execute_and_prove(target.to_str().unwrap(), args.read_arguments(), pcs_config);
+            let cairo_proof = execute_and_prove(
+                target.to_str().unwrap(),
+                args.read_arguments(),
+                hundred_bit_secure_config(),
+            );
             let elapsed = start.elapsed();
 
             // Serialize proof to file.
@@ -68,16 +73,18 @@ fn main() {
             let cairo_proof =
                 serde_json::from_reader(std::fs::File::open(proof.to_str().unwrap()).unwrap())
                     .unwrap();
-            let pcs_config = PcsConfig::default();
             let preprocessed_trace = match with_pedersen {
                 true => PreProcessedTraceVariant::Canonical,
                 false => PreProcessedTraceVariant::CanonicalWithoutPedersen,
             };
-            let result =
-                verify_cairo::<Blake2sMerkleChannel>(cairo_proof, pcs_config, preprocessed_trace);
+            let result = verify_cairo::<Blake2sMerkleChannel>(
+                cairo_proof,
+                hundred_bit_secure_config(),
+                preprocessed_trace,
+            );
             match result {
                 Ok(_) => info!("Verification successful"),
-                Err(e) => warn!("Verification failed: {:?}", e),
+                Err(e) => error!("Verification failed: {:?}", e),
             }
         }
     }

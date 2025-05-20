@@ -4,6 +4,7 @@ use std::time::Instant;
 use cairo_air::verifier::verify_cairo;
 use cairo_air::PreProcessedTraceVariant;
 use clap::{Parser, Subcommand};
+use log::{info, warn};
 use stwo_cairo_prover::stwo_prover::core::pcs::PcsConfig;
 use stwo_cairo_prover::stwo_prover::core::vcs::blake2_merkle::Blake2sMerkleChannel;
 use ursus::args::ProgramArguments;
@@ -50,6 +51,9 @@ enum Commands {
 }
 
 fn main() {
+    // Initialize the logger with default level of info
+    env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("info")).init();
+
     let cli = Cli::parse();
 
     match cli.command {
@@ -59,7 +63,7 @@ fn main() {
             arguments,
             arguments_file,
         } => {
-            println!("Generating proof for target: {:?}", target);
+            info!("Generating proof for target: {:?}", target);
             let start = Instant::now();
             let args = ProgramArguments {
                 arguments: arguments.unwrap_or_default(),
@@ -67,17 +71,18 @@ fn main() {
             };
             let cairo_proof = execute_and_prove(target.to_str().unwrap(), args.read_arguments());
             let elapsed = start.elapsed();
-            // serialize proof to file
+
+            // Serialize proof to file.
             let proof_json = serde_json::to_string(&cairo_proof).unwrap();
             std::fs::write(proof.to_str().unwrap(), proof_json).unwrap();
-            println!("Proof saved to: {:?}", proof);
-            println!("Proof generation completed in {:.2?}", elapsed);
+            info!("Proof saved to: {:?}", proof);
+            info!("Proof generation completed in {:.2?}", elapsed);
         }
         Commands::Verify {
             proof,
             with_pedersen,
         } => {
-            println!("Verifying proof from: {:?}", proof);
+            info!("Verifying proof from: {:?}", proof);
             let cairo_proof =
                 serde_json::from_reader(std::fs::File::open(proof.to_str().unwrap()).unwrap())
                     .unwrap();
@@ -88,7 +93,10 @@ fn main() {
             };
             let result =
                 verify_cairo::<Blake2sMerkleChannel>(cairo_proof, pcs_config, preprocessed_trace);
-            println!("Verification result: {:?}", result);
+            match result {
+                Ok(_) => info!("Verification successful"),
+                Err(e) => warn!("Verification failed: {:?}", e),
+            }
         }
     }
 }

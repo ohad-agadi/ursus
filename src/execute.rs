@@ -9,6 +9,7 @@ use cairo_vm::types::layout_name::LayoutName;
 use cairo_vm::types::program::Program;
 use cairo_vm::types::relocatable::MaybeRelocatable;
 use cairo_vm::Felt252;
+use log::{debug, info};
 use stwo_cairo_adapter::builtins::MemorySegmentAddresses;
 use stwo_cairo_adapter::memory::{MemoryBuilder, MemoryConfig, MemoryEntry};
 use stwo_cairo_adapter::vm_import::{adapt_to_stwo_input, RelocatedTraceEntry};
@@ -48,9 +49,9 @@ pub fn execute_and_prove(target_path: &str, args: Vec<Arg>) -> CairoProof<Blake2
         ..Default::default()
     };
 
-    println!("Executing program...");
+    info!("Executing program...");
     let runner = cairo_run_program(&program, &cairo_run_config, &mut hint_processor).unwrap();
-    println!("Program executed successfully.");
+    info!("Program executed successfully.");
     let public_input = runner.get_air_public_input().unwrap();
     let addresses = public_input
         .public_memory
@@ -104,15 +105,18 @@ pub fn execute_and_prove(target_path: &str, args: Vec<Arg>) -> CairoProof<Blake2
         false => PreProcessedTraceVariant::CanonicalWithoutPedersen,
     };
 
-    println!("Generating input for the prover...");
+    info!("Generating input for the prover...");
     let input =
         adapt_to_stwo_input(&trace, mem, addresses, &segments, public_segment_context).unwrap();
-    println!("Input for the prover generated successfully.\n");
-    println!("{}", input.state_transitions.casm_states_by_opcode);
-    println!("Builtins: {:#?}", input.builtins_segments.get_counts());
+    info!("Input for the prover generated successfully.");
+    debug!(
+        "State transitions: {}",
+        input.state_transitions.casm_states_by_opcode
+    );
+    debug!("Builtins: {:#?}", input.builtins_segments.get_counts());
 
-    println!("Using preprocessed trace: {:?}", preprocessed_trace);
-    println!("Proving...");
+    info!("Using preprocessed trace: {:?}", preprocessed_trace);
+    info!("Proving...");
     let pcs_config = PcsConfig::default();
     stwo_cairo_prover::prover::prove_cairo::<Blake2sMerkleChannel>(
         input,

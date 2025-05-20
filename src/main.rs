@@ -1,13 +1,28 @@
 use std::time::Instant;
 
 use cairo_air::verifier::verify_cairo;
-use cairo_air::PreProcessedTraceVariant;
+use cairo_air::{CairoProof, PreProcessedTraceVariant};
+use cairo_lang_runner::Arg;
 use clap::Parser;
 use log::{info, warn};
+use stwo_cairo_prover::stwo_prover::core::fri::FriConfig;
 use stwo_cairo_prover::stwo_prover::core::pcs::PcsConfig;
-use stwo_cairo_prover::stwo_prover::core::vcs::blake2_merkle::Blake2sMerkleChannel;
+use stwo_cairo_prover::stwo_prover::core::vcs::blake2_merkle::{
+    Blake2sMerkleChannel, Blake2sMerkleHasher,
+};
 use ursus::args::{Cli, Commands, ProgramArguments};
-use ursus::execute::execute_and_prove;
+use ursus::execute::execute;
+use ursus::prove::{prove, prover_input_from_runner};
+
+fn execute_and_prove(
+    target_path: &str,
+    args: Vec<Arg>,
+    pcs_config: PcsConfig,
+) -> CairoProof<Blake2sMerkleHasher> {
+    let runner = execute(target_path, args);
+    let input = prover_input_from_runner(&runner);
+    prove(input, pcs_config)
+}
 
 fn main() {
     env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("info")).init();
@@ -27,7 +42,16 @@ fn main() {
                 arguments: arguments.unwrap_or_default(),
                 arguments_file,
             };
-            let cairo_proof = execute_and_prove(target.to_str().unwrap(), args.read_arguments());
+            let pcs_config = PcsConfig {
+                pow_bits: 26,
+                fri_config: FriConfig {
+                    log_last_layer_degree_bound: 0,
+                    log_blowup_factor: 1,
+                    n_queries: 70,
+                },
+            };
+            let cairo_proof =
+                execute_and_prove(target.to_str().unwrap(), args.read_arguments(), pcs_config);
             let elapsed = start.elapsed();
 
             // Serialize proof to file.
@@ -56,5 +80,24 @@ fn main() {
                 Err(e) => warn!("Verification failed: {:?}", e),
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use cairo_vm::Felt252;
+    use num_bigint::BigInt;
+
+    use super::*;
+
+    #[test]
+    fn test_e2e() {
+        let target_path = "./example/target/release/example.executable.json";
+        let args = vec![Arg::Value(Felt252::from(BigInt::from(100)))];
+        let proof = execute_and_prove(target_path, args, PcsConfig::default());
+        let pcs_config = PcsConfig::default();
+        let preprocessed_trace = PreProcessedTraceVariant::CanonicalWithoutPedersen;
+        let result = verify_cairo::<Blake2sMerkleChannel>(proof, pcs_config, preprocessed_trace);
+        assert!(result.is_ok());
     }
 }

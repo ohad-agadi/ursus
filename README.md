@@ -67,8 +67,3 @@ ursus verify ./example_proof.json
 ## Pre-processed trace:
 When pedersen is used in the proof, more pre-processed columns are needed. The variant is automatically deduced during `prove`. 
 Verify with `--with-pedersen`.
-
-## Output
-
-- When generating a proof, the proof will be saved as a JSON file at the specified path
-- When verifying a proof, the result of the verification will be printed to the console

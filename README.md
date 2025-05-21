@@ -1,6 +1,10 @@
 # Ursus
 
-![Project Logo](logo.png)
+<p align="center">
+  <img src="logo.png" alt="Project Logo" width="300" />
+</p>
+
+
 
 Execute with sw development, prove with stwo-cairo-prover.
 

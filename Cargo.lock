@@ -566,7 +566,7 @@ checksum = "d71b6127be86fdcfddb610f7182ac57211d4b18a3e9c82eb2d17662f2227ad6a"
 [[package]]
 name = "cairo-air"
 version = "0.1.1"
-source = "git+https://github.com/starkware-libs/stwo-cairo?rev=9e1268e#9e1268e12e2ab62fdba945e4d79cb87ea5fa0f29"
+source = "git+https://github.com/starkware-libs/stwo-cairo?rev=b160127#b160127bc60b72922ea372661b04f69e8fa589ab"
 dependencies = [
  "itertools 0.12.1",
  "num-traits",
@@ -3141,7 +3141,7 @@ dependencies = [
 [[package]]
 name = "stwo-cairo-adapter"
 version = "0.1.0"
-source = "git+https://github.com/starkware-libs/stwo-cairo?rev=9e1268e#9e1268e12e2ab62fdba945e4d79cb87ea5fa0f29"
+source = "git+https://github.com/starkware-libs/stwo-cairo?rev=b160127#b160127bc60b72922ea372661b04f69e8fa589ab"
 dependencies = [
  "bincode 2.0.1",
  "bytemuck",
@@ -3164,7 +3164,7 @@ dependencies = [
 [[package]]
 name = "stwo-cairo-common"
 version = "0.1.0"
-source = "git+https://github.com/starkware-libs/stwo-cairo?rev=9e1268e#9e1268e12e2ab62fdba945e4d79cb87ea5fa0f29"
+source = "git+https://github.com/starkware-libs/stwo-cairo?rev=b160127#b160127bc60b72922ea372661b04f69e8fa589ab"
 dependencies = [
  "bytemuck",
  "itertools 0.12.1",
@@ -3180,7 +3180,7 @@ dependencies = [
 [[package]]
 name = "stwo-cairo-serialize"
 version = "0.1.0"
-source = "git+https://github.com/starkware-libs/stwo-cairo?rev=9e1268e#9e1268e12e2ab62fdba945e4d79cb87ea5fa0f29"
+source = "git+https://github.com/starkware-libs/stwo-cairo?rev=b160127#b160127bc60b72922ea372661b04f69e8fa589ab"
 dependencies = [
  "starknet-ff",
  "stwo-cairo-serialize-derive",
@@ -3190,7 +3190,7 @@ dependencies = [
 [[package]]
 name = "stwo-cairo-serialize-derive"
 version = "0.1.0"
-source = "git+https://github.com/starkware-libs/stwo-cairo?rev=9e1268e#9e1268e12e2ab62fdba945e4d79cb87ea5fa0f29"
+source = "git+https://github.com/starkware-libs/stwo-cairo?rev=b160127#b160127bc60b72922ea372661b04f69e8fa589ab"
 dependencies = [
  "quote",
  "syn 2.0.101",
@@ -3222,7 +3222,7 @@ dependencies = [
 [[package]]
 name = "stwo_cairo_prover"
 version = "0.1.0"
-source = "git+https://github.com/starkware-libs/stwo-cairo?rev=9e1268e#9e1268e12e2ab62fdba945e4d79cb87ea5fa0f29"
+source = "git+https://github.com/starkware-libs/stwo-cairo?rev=b160127#b160127bc60b72922ea372661b04f69e8fa589ab"
 dependencies = [
  "cairo-air",
  "hex",

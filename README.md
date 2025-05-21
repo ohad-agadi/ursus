@@ -1,5 +1,7 @@
 # Ursus
 
+![Project Logo](logo.png)
+
 Execute with sw development, prove with stwo-cairo-prover.
 
 ## Prerequisites
